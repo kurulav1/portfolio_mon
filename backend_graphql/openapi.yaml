@@ -1,0 +1,260 @@
+openapi: 3.0.1
+info:
+  title: Stock Options and Strategies API
+  description: API for managing stock options and option strategies
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+paths:
+  /api/stock/{ticker}:
+    get:
+      summary: Fetch daily open/close data for a specific stock
+      parameters:
+        - in: path
+          name: ticker
+          schema:
+            type: string
+          required: true
+          description: Stock ticker symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Failed to fetch data
+
+  /api/options-chain/{ticker}:
+    get:
+      summary: Fetch options chain for a given ticker
+      parameters:
+        - in: path
+          name: ticker
+          schema:
+            type: string
+          required: true
+          description: Stock ticker symbol
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  calls:
+                    type: array
+                    items:
+                      type: object
+                  puts:
+                    type: array
+                    items:
+                      type: object
+        '500':
+          description: Failed to fetch options chain
+
+  /api/options:
+    post:
+      summary: Create a new stock option
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+      responses:
+        '201':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Could not save stock option
+
+    get:
+      summary: Retrieve all saved options
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '500':
+          description: Could not fetch options
+
+  /api/options/{id}:
+    delete:
+      summary: Delete a stock option by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Stock option ID
+      responses:
+        '204':
+          description: Successfully deleted
+        '500':
+          description: Could not delete option
+
+  /api/strategies:
+    post:
+      summary: Create a new strategy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                options:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Could not create strategy
+
+    get:
+      summary: Retrieve all strategies
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '500':
+          description: Could not fetch strategies
+
+  /api/strategies/{id}:
+    get:
+      summary: Retrieve a specific strategy by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Strategy ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Strategy not found
+        '500':
+          description: Could not fetch strategy
+
+    put:
+      summary: Update a strategy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Strategy ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Could not update strategy
+
+    delete:
+      summary: Delete a strategy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Strategy ID
+      responses:
+        '204':
+          description: Successfully deleted
+        '500':
+          description: Could not delete strategy
+
+  /api/strategies/{id}/options:
+    post:
+      summary: Add an option to an existing strategy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Strategy ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successfully added option
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Could not add option to strategy
+
+  /api/strategies/{strategyId}/options/{optionId}:
+    delete:
+      summary: Delete an option from a strategy
+      parameters:
+        - in: path
+          name: strategyId
+          schema:
+            type: string
+          required: true
+          description: Strategy ID
+        - in: path
+          name: optionId
+          schema:
+            type: string
+          required: true
+          description: Option ID
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          description: Strategy not found
+        '500':
+          description: Could not delete option from strategy
